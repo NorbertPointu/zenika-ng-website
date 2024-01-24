@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { BasketService } from '../basket/basket.service';
 
 @Component({
   selector: 'app-menu',
@@ -9,4 +10,7 @@ import { Component } from '@angular/core';
 })
 export class MenuComponent {
 
+  private basketService  = inject(BasketService)
+
+  get nbItemsInBasket() {return this.basketService.items.length} 
 }

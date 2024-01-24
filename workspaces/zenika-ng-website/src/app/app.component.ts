@@ -1,54 +1,44 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MenuComponent } from './menu/menu.component';
 import { Product } from './product/product.types';
-import { ProductComponent } from "./product/product.component";
-
-
-
+import { ProductComponent } from './product/product.component';
+import { CurrencyPipe, NgFor, NgIf } from '@angular/common';
+import { CatalogService } from './catalog/catalog.service';
+import { BasketService } from './basket/basket.service';
+import { SelectProductKeyComponent } from "./select-product-key/select-product-key.component";
+import { SelectProductKey } from './select-product-key/select-product-key.types';
+import { SortProductsPipe } from './sort-product/sort-product.pipe';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, MenuComponent, ProductComponent]
+    imports: [RouterOutlet, MenuComponent, ProductComponent, NgFor, NgIf, CurrencyPipe, SelectProductKeyComponent, SortProductsPipe]
 })
 export class AppComponent {
   title = 'my first component';
+  basket: { quantity: number; product: Product }[] = [];
 
-  products: Productc =[
-    {
-      "id": "welsch",
-      "title": "Coding the welsch",
-      "description": "Tee-shirt col rond - Homme",
-      "photo": "/assets/coding-the-welsch.jpg",
-      "price": 20,
-      "stock": 2
-    },
-    {
-      "id": "world",
-      "title": "Coding the world",
-      "description": "Tee-shirt col rond - Homme",
-      "photo": "/assets/coding-the-world.jpg",
-      "price": 18,
-      "stock": 2
-    },
-    {
-      "id": "vador",
-      "title": "Duck Vador",
-      "description": "Tee-shirt col rond - Femme",
-      "photo": "/assets/coding-the-stars.jpg",
-      "price": 21,
-      "stock": 2
-    },
-    {
-      "id": "snow",
-      "title": "Coding the snow",
-      "description": "Tee-shirt col rond - Femme",
-      "photo": "/assets/coding-the-snow.jpg",
-      "price": 19,
-      "stock": 2
-    }
-  ]
+  protected catalogService = inject(CatalogService)
+  protected basketService = inject(BasketService)
+  productKey: SelectProductKey = undefined;
+
+  protected addItem(product: Product) {
+    if (this.catalogService.decreaseStock(product.id)){
+    this.basketService.addItem(product)}
+  }
+  
+  get total() {
+    return this.basketService.total;
+  }
+
+  get products() {
+    return this.catalogService.products;
+  }
+
+  get hasProductsInStock() {
+    return this.catalogService.hasProductsInStock;
+  }
 }
