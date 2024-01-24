@@ -1,59 +1,35 @@
-import { Component, Injectable, NgModule } from '@angular/core';
+import { Component, Injectable, NgModule, inject, signal } from '@angular/core';
 import { Product } from '../product/product.types';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
-  _products: Product[] = [
-    {
-      id: 'welsch',
-      title: 'Coding the welsch',
-      description: 'Tee-shirt col rond - Homme',
-      photo: '/assets/coding-the-welsch.jpg',
-      price: 20,
-      stock: 2,
-    },
-    {
-      id: 'world',
-      title: 'Coding the world',
-      description: 'Tee-shirt col rond - Homme',
-      photo: '/assets/coding-the-world.jpg',
-      price: 18,
-      stock: 2,
-    },
-    {
-      id: 'vador',
-      title: 'Duck Vador',
-      description: 'Tee-shirt col rond - Femme',
-      photo: '/assets/coding-the-stars.jpg',
-      price: 21,
-      stock: 2,
-    },
-    {
-      id: 'snow',
-      title: 'Coding the snow',
-      description: 'Tee-shirt col rond - Femme',
-      photo: '/assets/coding-the-snow.jpg',
-      price: 19,
-      stock: 2,
-    },
-  ];
+  private _products = signal<Product[]>([]);
+
+  private httpClient = inject(HttpClient);
 
   get products(): Product[] {
-    return this._products;
+    return this._products();
   }
 
-  get hasProductsInStock() : boolean {
-    return this._products.some(({stock})=>stock > 0)
+  get hasProductsInStock(): boolean {
+    return this._products().some(({ stock }) => stock > 0);
   }
 
-  decreaseStock(productId:string) {
-    const product = this._products.find(({id})=> id === productId)
-    if (!product){
-        return false
+  fetchProducts() {
+    return this.httpClient
+      .get<Product[]>('http://localhost:8080/api/products')
+      .pipe(tap({ next: (response) => this._products.set(response) }));
+  }
+
+  decreaseStock(productId: string) {
+    const product = this._products().find(({ id }) => id === productId);
+    if (!product) {
+      return false;
     }
 
-    product.stock -= 1
+    product.stock -= 1;
 
-    return true
-
+    return true;
   }
 }

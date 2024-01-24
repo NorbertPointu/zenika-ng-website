@@ -3,7 +3,9 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import {languageProviders} from './providers/language.provider';
+import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), languageProviders]
+  providers: [provideRouter(routes), languageProviders, provideHttpClient(withFetch())]
+
 };

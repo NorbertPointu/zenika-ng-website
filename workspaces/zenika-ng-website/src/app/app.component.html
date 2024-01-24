@@ -23,7 +23,7 @@
       class="col"
       *ngIf="product.stock > 0"
       [product]="product"
-      (addToBasket)="addItem($event)"
+      (addToBasket)="addBasket($event)"
     />}
   </div>
   } @else {
